@@ -67,7 +67,8 @@ ptr = nullptr;  // 2. 🔑 绝杀：释放后立即将指针手工清空为 null
 * 转换契约：std::nullptr_t 是一种极其特殊的类型。C++ 标准强制约束：它***允许隐式转换为任意类型的「原始指针类型」或「成员指针类型」，但严禁隐式转换为任何「整型（如 int、bool）」（除非显式强转）***。
 ```cpp
 std::nullptr_t my_null = nullptr; // ✅ 合法，直接声明其原生类型
-int* p1 = nullptr;    // ✅ 安全：隐式转换为 int*char* p2 = nullptr;   // ✅ 安全：隐式转换为 char*
+int* p1 = nullptr;    // ✅ 安全：隐式转换为 int*
+char* p2 = nullptr;   // ✅ 安全：隐式转换为 char*
 // int x = nullptr;   // ❌ 编译直接暴毙！铁律防线阻断其向整数的转换
 ```
 ------------------------------
