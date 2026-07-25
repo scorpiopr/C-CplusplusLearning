@@ -3,20 +3,22 @@
 ## 一、 字面量本质：宏定义 vs 关键字
 ## 1. NULL 的宏定义
 在 C++ 中，为了兼容老旧的 C 语言代码，NULL 被定义为一个宏（Macro）。其底层源码通常如下：
-```
+
+```cpp
 #ifndef NULL
     #ifdef __cplusplus
         #define NULL 0          // 🔑 致命：在 C++ 中，NULL 就是纯整数 0！
     #else
         #define NULL ((void *)0) // 在纯 C 语言中，NULL 是 void* 指针
-    #endif#endif
+    #endif
+#endif
 ```
 因为 C++ 不允许 void* 隐式转换为其他指针类型（如 int*），为了让 int* p = NULL; 能够跑通，C++ 只能委曲求全，硬生生地把 NULL 宏定义为纯整数 0。
 ## 2. nullptr 的现代化救赎
 nullptr 是 C++11 引入的原生关键字（Keyword）。它在底层不再是任何整数，而是一个专门用来代表“空指针”的强类型字面量。
 ------------------------------
 ## 二、 函数重载
-```
+```cpp
 #include <iostream>
 void f(int x) { 
     std::cout << "调用了整数重载 f(int)" << std::endl; 
@@ -40,7 +42,7 @@ int main() {
 ## 三、 💡注意
 1. 空指针可以被释放
 C语言中free()和C++中delete()（释放new分配的单个对象）和delete[]（释放new[]分配的对象数组）都可释放空指针。
-```
+```cpp
 int* p1 = NULL;
 free(p1);       // ✅ 绝对安全，什么都不会发生
 
@@ -49,7 +51,7 @@ delete p2;      // ✅ 绝对安全，什么都不会发生
 delete[] p2;    // ✅ 绝对安全，什么都不会发生
 ```
 2. 指针释放后置空防止变成野指针
-```
+```cpp
 // ❌ 业余且画蛇添足的写法：
 if (ptr != NULL) { 
     delete ptr; // 没必要！delete 内部本来就会再查一遍，这是双重浪费
@@ -63,7 +65,7 @@ ptr = nullptr;  // 2. 🔑 绝杀：释放后立即将指针手工清空为 null
 
 * nullptr 的底层类型不是 void*，也不是任何普通的指针，而是一个由 C++ 内置的、独一无二的全新标准类型——std::nullptr_t。
 * 转换契约：std::nullptr_t 是一种极其特殊的类型。C++ 标准强制约束：它***允许隐式转换为任意类型的「原始指针类型」或「成员指针类型」，但严禁隐式转换为任何「整型（如 int、bool）」（除非显式强转）***。
-```
+```cpp
 std::nullptr_t my_null = nullptr; // ✅ 合法，直接声明其原生类型
 int* p1 = nullptr;    // ✅ 安全：隐式转换为 int*char* p2 = nullptr;   // ✅ 安全：隐式转换为 char*
 // int x = nullptr;   // ❌ 编译直接暴毙！铁律防线阻断其向整数的转换
