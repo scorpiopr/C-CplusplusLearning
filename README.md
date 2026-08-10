@@ -6,6 +6,6 @@
 
 ## [网络](https://github.com/scorpiopr/CSLearning/tree/main/Network)
 
-## QT
+## [QT](https://github.com/scorpiopr/CSLearning/tree/main/QT)
 ### 参考
 1. [从零开始的Qt开发指南](https://cloud.tencent.com/developer/article/2617194)
