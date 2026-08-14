@@ -4,6 +4,8 @@
 
 [菜鸟教程](https://www.runoob.com/cplusplus/cpp-multithreading.html "多线程")
 
+[C++ 多线程编程](https://immortalqx.github.io/2021/12/04/cpp-notes-3/)
+
 ------------------------------
 ## 一、 工业级标准的完美现代 C++ 代码
 ```cpp
