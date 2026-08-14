@@ -3,7 +3,7 @@
 ## 💻 四大核心用法代码示例
 ## 1. 绑定普通函数与 Lambda 表达式
 这是最基础的用法，用于替代传统的、可读性较差的函数指针。
-```
+```cpp
 #include <iostream>
 #include <functional>
 int addFunc(int a, int b) { return a + b; }
@@ -22,7 +22,7 @@ int main() {
 ```
 ## 2. 绑定仿函数（Functor）
 仿函数是一个重载了 operator() 的类或结构体。std::function 可以无缝接收它。
-```
+```cpp
 struct Subtractor {
     int operator()(int a, int b) { return a - b; }
 };
@@ -33,7 +33,7 @@ int main() {
 ```
 ## 3. 绑定类的成员函数（面试高频考点）
 非静态类成员函数在调用时，必须依赖一个具体的类对象（this 指针）。有两种常见写法：
-```
+```cpp
 class Calculator {
 public:
     int multiply(int a, int b) { return a * b; }
@@ -53,7 +53,7 @@ int main() {
 ```
 ## 4. 作为“回调函数”参数（项目/八股高频应用）
 在网络编程（如线程池、事件驱动回调）中，std::function 通常作为参数传递，用来实现解耦。
-```
+```cpp
 // 一个触发回调的函数，接收一个 std::function
 void performTask(int x, std::function<void(int)> callback) {
     int result = x * 2; // 模拟任务执行
