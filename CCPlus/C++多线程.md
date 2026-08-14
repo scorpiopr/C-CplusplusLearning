@@ -7,9 +7,13 @@
 ------------------------------
 ## 一、 工业级标准的完美现代 C++ 代码
 ```cpp
-#include <iostream>#include <thread>
-#include <mutex>#include <condition_variable>#include <vector>
-class AlternatePrinter {private:
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <vector>
+class AlternatePrinter {
+private:
     std::mutex mtx;
     std::condition_variable cv;
     int state = 0; // 🔑 核心状态机：0->A, 1->B, 2->C
