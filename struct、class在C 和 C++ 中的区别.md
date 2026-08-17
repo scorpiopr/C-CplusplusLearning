@@ -25,9 +25,11 @@ struct Empty {};
 
 ## 三、 C++ 中 struct 与 class 的唯一区别
 访问和继承默认权限不同
-```
-struct S { int a; }; // 🔑 默认是 public，外部可直接访问class C  { int a; }; // 🔑 默认是 private，外部无法直接访问
-struct DerivedS : S {}; // 🔑 默认是 public 继承class DerivedC  : C {}; // 🔑 默认是 private 继承
+```cpp
+struct S { int a; }; // 🔑 默认是 public，外部可直接访问
+class C  { int a; }; // 🔑 默认是 private，外部无法直接访问
+struct DerivedS : S {}; // 🔑 默认是 public 继承
+class DerivedC  : C {}; // 🔑 默认是 private 继承
 ```
 除了这两个默认权限的微小差异外，C++ 的 struct 可以写显式构造函数、可以写析构函数、可以继承、可以使用 virtual 关键字写虚函数、甚至能参与运行期的多态机制，它和 class 在底层编译出来的机器码没有任何区别。
 ------------------------------
