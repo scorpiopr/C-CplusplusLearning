@@ -32,4 +32,59 @@
 * 绝对值 $+$ 绝对值 $=$ 毫无数学意义：$\text{dBm} + \text{dBm}$（错误，编译或物理逻辑直接报错）。
 ## 信道映射：
   逻辑信道（CCCH/DCCH/DTCH）、传输信道（BCH/DL-SCH/UL-SCH）到物理信道的映射关系。
+
+# 问题
+## 编程题：找到无序数组第k大的数
+## 机械手2路信号输入，包括控制手自由度的矩阵数据，实现手指的运动，需要设计哪些接口实现哪些具体功能
+
+### 一、 外部输入接口（2路信号接收）
+这部分接口负责从外界（如5G无线模组、上层视觉AI或主控系统）接收2路输入信号，并将其高效地存入 EulerOS 的内存中。
+1. 信号 1：控制手自由度的矩阵数据（高带宽、流式数据）
+
+* 功能：接收表示手部关节角度、位置或速度的齐次变换矩阵或关节配置矩阵（例如：$4 \times 4$ 空间位姿矩阵，或 $M \times N$ 的关节目标角度矩阵）。
+* 接口设计（API 示例）：
+  * int init_matrix_receiver_socket(const char* ip, int port); —— 初始化 UDP/TCP 监听套接字（推荐 UDP，因为机械手控制对时延极度敏感，允许少量丢包，但不能容忍 TCP 重传带来的阻塞）。
+   * int parse_hand_matrix(const uint8_t* raw_buf, size_t len, float* out_matrix); —— 高效解析原始二进制流为浮点数矩阵，需在用户态进行严格的 数据校验（如 CRC32 或校验和），防止无线传输中的错码导致机械手误动伤人。
+
+2. 信号 2：状态/触发控制信号（低频、高可靠）
+
+* 功能：接收离散的控制指令（如：开始抓取、紧急停止、切换模式、握力调节、复位等）。
+* 接口设计（API 示例）：
+* int register_command_callback(uint16_t cmd_id, void (*callback)(void* arg)); —— 回调函数注册接口。当收到特定控制指令（如基站/远端下发的 EMERGENCY_STOP）时，立即触发中断级或高优先级线程的回调。
+
+### 二、 内部核心处理模块接口（Linux 用户态核心层）
+数据进入 EulerOS 后，需要通过高效的进程间通信 (IPC) 和核心算法，将矩阵数据转化为具体的“手指运动指令”。
+1. 共享内存与无锁队列接口（数据传输）
+为了实现无延迟的数据传递，避免传统的 Linux read/write 带来内核态与用户态的内存拷贝，建议设计共享内存 (Shared Memory) + 环形缓冲区 (Ring Buffer) 接口。
+
+* 接口设计：
+  * shm_ringbuf_t* create_shm_queue(key_t key, size_t buffer_size); —— 创建基于共享内存的无锁环形队列。
+   * int enqueue_matrix_data(shm_ringbuf_t* queue, const float* matrix); —— 写端（网络接收线程）将矩阵压入队列。
+   * int dequeue_matrix_data(shm_ringbuf_t* queue, float* matrix); —— 读端（运动学计算线程）从队列读取矩阵。
+
+2. 运动学逆解与轨迹规划接口（功能核心）
+
+* 功能：将输入的空间自由度矩阵（笛卡尔空间），转化为机械手各个手指关节的旋转角度（关节空间）。
+* 接口设计：
+  * int calculate_inverse_kinematics(const float* target_matrix, float* out_joint_angles); —— 逆运动学算法接口。输入 $4 \times 4$ 矩阵，输出如 5 根手指共 15 个自由度的目标角度。
+   * int trajectory_interpolation(const float* current_angles, const float* target_angles, float step, float* next_step_angles); —— 轨迹插补接口。防止手指运动幅度过大导致电机过载，将其分解为平滑的微步。
+
+### 三、 底层硬件/驱动接口（控制手指运动）
+将计算出的关节角度，转化为硬件能识别的电信号或总线协议数据包。在机器人中，通常走 EtherCAT、CAN-Open 或 UART (RS485) 总线。
+1. 总线通信与同步接口
+
+* 功能：将所有手指的运动指令打包，通过总线在同一个控制周期（如 1ms 或 2ms）内同步发送给各个手指的伺服电机。
+* 接口设计：
+  * int init_bus_driver(const char* device_node); —— 初始化驱动节点（如 /dev/ttyUSB0 或 /dev/ethercat0）。
+   * int pack_motor_commands(const float* joint_angles, uint8_t* tx_packet); —— 按照电机协议（如 Modbus 或自定义 CAN 帧）封包。
+   * int sync_write_motors(const uint8_t* tx_packet, size_t len); —— 同步写入接口。利用 Linux 的 ioctl 或通过驱动直接操作硬件，确保所有手指的电机同时收到指令。
+
+2. 安全保护与状态反馈接口
+
+* 功能：实时读取手指电机的传感器数据（角度反馈、当前电流/触觉限制），防止夹毁物体或限位碰撞。
+* 接口设计：
+  * int read_motor_feedback(int motor_id, float* current_angle, float* current_torque); —— 读取指定手指电机的角度和扭矩。
+   * int set_safety_torque_limit(int motor_id, float max_torque); —— 设置手指的最大安全握力。一旦超过该阈值，触发保护，手指停止加力。
+
+------------------------------
   
