@@ -5,7 +5,7 @@
 | 7. 应用层 (Application) | 应用层 (合并了OSI的上三层) | 人机交互与服务 直接为用户的应用程序提供网络接口。 | 报文 (Message) | HTTP/HTTPS (网页) DNS (域名解析) FTP (文件传输) SSH (远程安全登录) SMTP/IMAP (邮件) |
 | 6. 表示层 (Presentation) | ~ | 翻译官 负责数据的加密、解密、压缩及格式转换。 | ~ | SSL/TLS (加密) JPEG / MP4 / ASCII |
 | 5. 会话层 (Session) | ~ | 自动连线员 建立、管理和断开应用程序之间的会话。 | ~ | RPC (远程过程调用) SQL 会话 |
-| 4. 传输层 (Transport) | 传输层 | 端到端传输 负责进程到进程的数据传输，控制可靠性。 | 段 (Segment) / 报文段 | TCP (可靠、三次握手) UDP (不可靠、快、直播游戏) TLS (常寄生于此) |
+| 4. 传输层 (Transport) | 传输层 | 端到端传输 负责进程到进程的数据的分段、打包、重组，控制可靠性。 | 段 (Segment) / 报文段 | TCP (可靠、三次握手) UDP (不可靠、快、直播游戏) TLS (常寄生于此) |
 | 3. 网络层 (Network) | 网络层 | 寻址与路由选择 根据IP地址选择最佳路径，跨局域网传输。 | 包 (Packet) / IP数据报 | IP (IPv4/IPv6) ICMP (Ping命令核心) ARP (IP转MAC地址) OSPF / BGP (路由协议) |
 | 2. 数据链路层 (Data Link) | 数据链路层 | 局域网精准投递 在相邻节点间通过 MAC 地址安全传数据。 | 帧 (Frame) | Ethernet (以太网/网线) Wi-Fi (802.11) PPP (宽带拨号) VLAN (虚拟局域网) |
 | 1. 物理层 (Physical) | 物理层 | 传输原始信号 把数据变成网线里的电流、光纤里的光。 | 比特 (Bit) | RJ-45 (网线水晶头) USB 光纤接口标准 |
